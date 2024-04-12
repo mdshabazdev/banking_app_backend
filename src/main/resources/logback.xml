@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<property name="app.logs.path" value="/app/logs" />
+	<property name="encoderPattern"
+		value="%date{yyyy-MM-dd'T'HH:mm:ss}: [%-5level] [%thread] [%logger{36}.%M] - %msg%n"/>
+		
+    <appender name="app_logs"
+    	class="ch.qos.logback.core.rolling.RollingFileAppender">
+    	<File>${app.logs.path}/banking-app.log</File>
+    	<rollingPolicy
+    		class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    		<fileNamePattern>${app.logs.path}/banking-app.%d{yyyy-MM-dd}.log</fileNamePattern>	
+    	</rollingPolicy>
+    	<encoder>
+    		<pattern>${encoderPattern}</pattern>
+    	</encoder>
+    </appender>
+    
+    <logger level="DEBUG" name="com.example.banking.application" additivity="false">
+    	<appender-ref ref="app_logs" />
+    </logger>
+</Configuration>
