@@ -18,6 +18,8 @@ import com.example.banking.application.dto.RegisterRequest;
 import com.example.banking.application.exception.UserExistsException;
 import com.example.banking.application.repository.CustomerRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AuthenticationService {
 
@@ -36,21 +38,23 @@ public class AuthenticationService {
 	@Autowired
 	JWTTokenUtil tokenUtil;
 
+	@Transactional
 	public AuthenticationResponse register(RegisterRequest request) throws Exception {
 
 		List<String> usernames = customerRepository.findByUserdetails(request.getUsername(), request.getContact(),
 				request.getEmail());
-		CustomerEntity customer = new CustomerEntity();
 		if (usernames.isEmpty()) {
 			try {
-				customer.setFirstName(request.getFirstName());
-				customer.setLastName(request.getLastName());
-				customer.setEmail(request.getEmail());
-				customer.setContact(request.getContact());
-				customer.setUsername(request.getUsername());
-				customer.setRole(request.getRole());
-				customer.setUserstatus(request.getUserstatus());
-				customer.setPassword(passwordEncoder.encode(request.getPassword()));
+				CustomerEntity customer = CustomerEntity.builder()
+						.firstName(request.getFirstName())
+						.lastName(request.getLastName())
+						.email(request.getEmail())
+						.contact(request.getContact())
+						.username(request.getUsername())
+						.role(request.getRole())
+						.userstatus(request.getUserstatus())
+						.password(passwordEncoder.encode(request.getPassword()))
+						.build();
 
 				customerRepository.save(customer);
 
@@ -69,7 +73,6 @@ public class AuthenticationService {
 	public String authenticate(AuthenticationRequest authenticationRequest) {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-		String token = tokenUtil.generateToken(userDetails);
-		return token;
+		return tokenUtil.generateToken(userDetails);
 	}
 }

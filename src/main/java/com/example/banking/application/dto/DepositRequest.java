@@ -1,5 +1,7 @@
 package com.example.banking.application.dto;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,13 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RegisterRequest {
-	private String firstName;
-	private String lastName;
-	private String email;
-	private String contact;
-	private String username;
-	private String password;
-	private String role;
-	private String userstatus;
+public class DepositRequest {
+
+	private long accountId;
+	private BigDecimal amount;
+
 }

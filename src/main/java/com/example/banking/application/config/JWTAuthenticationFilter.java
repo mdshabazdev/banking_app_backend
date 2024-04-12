@@ -48,7 +48,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}
 			}
-			filterChain.doFilter(request, response);
 		} catch (ExpiredJwtException expiredJwtException) {
 			request.setAttribute("exception", expiredJwtException);
 		} catch (BadCredentialsException badCredentialsException) {

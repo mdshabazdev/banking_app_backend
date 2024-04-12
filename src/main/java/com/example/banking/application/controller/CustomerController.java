@@ -46,6 +46,7 @@ public class CustomerController {
 			resp.setError("Unauthorized! Bad credentials");
 			return new ResponseEntity<AuthenticationResponse>(resp, HttpStatus.UNAUTHORIZED);
 		} catch (Exception exception) {
+			logger.error("Some exception occured at the server: ", exception.getMessage());
 			return ResponseEntity.internalServerError().body("Something went wong while registering user");
 		}
 	}

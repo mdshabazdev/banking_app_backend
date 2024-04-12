@@ -17,9 +17,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "customer")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class CustomerEntity implements UserDetails {
 
 	@Id
@@ -53,87 +63,6 @@ public class CustomerEntity implements UserDetails {
 	@OneToMany(cascade=CascadeType.ALL)
 	@JoinColumn(name="customer_id")
 	private Set<AccountEntity> accounts;
-
-	public long getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(long customerId) {
-		this.customerId = customerId;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getContact() {
-		return contact;
-	}
-
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getUserstatus() {
-		return userstatus;
-	}
-
-	public void setUserstatus(String userstatus) {
-		this.userstatus = userstatus;
-	}
-	
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-	
-
-	public Set<AccountEntity> getAccounts() {
-		return accounts;
-	}
-
-	public void setAccounts(Set<AccountEntity> accounts) {
-		this.accounts = accounts;
-	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
