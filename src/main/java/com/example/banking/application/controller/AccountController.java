@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.banking.application.dto.AuthenticationResponse;
+import com.example.banking.application.dto.AccountsResponse;
 import com.example.banking.application.dto.CreateAccountResponse;
 import com.example.banking.application.exception.AccountExistsException;
 import com.example.banking.application.exception.InvalidAccountTypeException;
@@ -44,7 +44,22 @@ public class AccountController {
 			return new ResponseEntity<CreateAccountResponse>(createAccountResponse, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			logger.error("Some exception occured at the server: ", e);
-			return ResponseEntity.internalServerError().body("Some exception occured at the server");
+			createAccountResponse.setError("Some exception occured at the server");
+			return ResponseEntity.internalServerError().body(createAccountResponse);
 		}
+	}
+	
+	@GetMapping("/fetchAccounts")
+	public ResponseEntity<?> fetchUserAccounts() {
+		AccountsResponse accountsResponse = new AccountsResponse();
+		try {
+			accountsResponse.setAccounts(accountService.fetchAccounts());
+			return ResponseEntity.ok(accountsResponse);
+		} catch (Exception e) {
+			logger.error("Some exception occured at the server: ", e);
+			accountsResponse.setError(e.getMessage());
+			return ResponseEntity.internalServerError().body(accountsResponse);
+		}
+		
 	}
 }

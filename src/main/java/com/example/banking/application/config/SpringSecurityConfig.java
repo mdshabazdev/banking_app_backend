@@ -38,7 +38,8 @@ public class SpringSecurityConfig {
 					auth
 					.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
 					.requestMatchers(WHITE_LIST_URL).permitAll()
-					.requestMatchers("/api/user/**").hasRole("USER")
+					.requestMatchers("/api/account/**").hasRole("USER")
+					.requestMatchers("/api/transaction/**").hasRole("USER")
 					.anyRequest().authenticated();
 				})
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

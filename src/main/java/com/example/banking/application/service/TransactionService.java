@@ -9,6 +9,10 @@ import javax.security.auth.login.AccountNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,8 +21,12 @@ import com.example.banking.application.dao.AccountEntity;
 import com.example.banking.application.dao.CustomerEntity;
 import com.example.banking.application.dao.TransactionEntity;
 import com.example.banking.application.dto.SendMoneyRequest;
+import com.example.banking.application.dto.TransactionsRequest;
+import com.example.banking.application.dto.TransactionsResponse;
+import com.example.banking.application.dto.TransactionsResponse.TransactionDetails;
 import com.example.banking.application.exception.InSufficientBalanceException;
 import com.example.banking.application.exception.InvalidAccountDetailsException;
+import com.example.banking.application.exception.InvalidAccountException;
 import com.example.banking.application.repository.AccountRepository;
 import com.example.banking.application.repository.CustomerRepository;
 import com.example.banking.application.repository.TransactionRepository;
@@ -82,7 +90,7 @@ public class TransactionService {
 	public String sendMoneyTransact(long fromAccountId, long accountId, BigDecimal amount) throws Exception {
 		AccountEntity fromAccountEntity = getValidUserAccount(fromAccountId);
 		if(fromAccountEntity == null) {
-			throw new Exception("Account id doesn't belongs to the user");
+			throw new InvalidAccountException("Account id doesn't belongs to the user");
 		}
 		
 		if (fromAccountEntity.getBalance().compareTo(amount) < 0) {
@@ -145,5 +153,31 @@ public class TransactionService {
 			}
 		}
 		return null;
+	}
+
+	public TransactionsResponse fetchTransactions(TransactionsRequest transactionsRequest) throws Exception {
+		
+		AccountEntity fromAccountEntity = getValidUserAccount(transactionsRequest.getAccountId());
+		if(fromAccountEntity == null) {
+			throw new InvalidAccountException("Account id doesn't belongs to the user");
+		}
+		
+		String sortBy = "timestamp";
+		Sort sort = Sort.by(sortBy).descending();
+
+		Pageable pageable = PageRequest.of(transactionsRequest.getPageIndex(), transactionsRequest.getPageSize(), sort);
+		
+		Page<TransactionEntity> accountPage = transactionRepository.findByAccountId(transactionsRequest.getAccountId(), pageable);
+		
+		TransactionsResponse transactionsResponse = new TransactionsResponse();
+		TransactionDetails txDetails = transactionsResponse.getTransactionDetails();
+		txDetails.setAccountId(fromAccountEntity.getAccountId());
+		txDetails.setTransactions(accountPage.getContent());
+		txDetails.setBalance(fromAccountEntity.getBalance());
+		txDetails.setPageIndex(accountPage.getNumber());
+		txDetails.setPageSize(transactionsRequest.getPageSize());
+		txDetails.setTotal(accountPage.getTotalElements());
+		transactionsResponse.setTransactionDetails(txDetails);
+		return transactionsResponse;
 	}
 }

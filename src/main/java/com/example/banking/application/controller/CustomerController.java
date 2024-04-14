@@ -47,18 +47,22 @@ public class CustomerController {
 			return new ResponseEntity<AuthenticationResponse>(resp, HttpStatus.UNAUTHORIZED);
 		} catch (Exception exception) {
 			logger.error("Some exception occured at the server: ", exception.getMessage());
-			return ResponseEntity.internalServerError().body("Something went wong while registering user");
+			resp.setError("Something went wong while registering user");
+			return ResponseEntity.internalServerError().body(resp);
 		}
 	}
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+		AuthenticationResponse resp = new AuthenticationResponse();
 		try {
 			return ResponseEntity.ok(authenticationService.register(request));
 		} catch (UserExistsException ex) {
-			return new ResponseEntity<>("Username or email or contact number already exists.", HttpStatus.BAD_REQUEST);
+			resp.setError("Username or email or contact number already exists.");
+			return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
 		} catch (Exception ex) {
-			return ResponseEntity.internalServerError().body("Something went wong while registering user");
+			resp.setError("Something went wong while registering user");
+			return ResponseEntity.internalServerError().body(resp);
 		}
 	}
 }

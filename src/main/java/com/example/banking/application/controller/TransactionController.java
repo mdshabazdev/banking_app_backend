@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.banking.application.dto.DepositRequest;
 import com.example.banking.application.dto.SendMoneyRequest;
 import com.example.banking.application.dto.TransactionResponse;
+import com.example.banking.application.dto.TransactionsRequest;
+import com.example.banking.application.dto.TransactionsResponse;
 import com.example.banking.application.dto.WithdrawRequest;
 import com.example.banking.application.exception.InSufficientBalanceException;
 import com.example.banking.application.exception.InvalidAccountDetailsException;
+import com.example.banking.application.exception.InvalidAccountException;
 import com.example.banking.application.service.TransactionService;
 
 @RestController
@@ -50,7 +53,8 @@ public class TransactionController {
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			logger.error("Some exception occured at the server: ", e);
-			return ResponseEntity.internalServerError().body("Something went wong while deposit");
+			transactionResponse.setError("Something went wong while deposit");
+			return ResponseEntity.internalServerError().body(transactionResponse);
 		}
 	}
 	
@@ -73,7 +77,8 @@ public class TransactionController {
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			logger.error("Some exception occured at the server: ", e);
-			return ResponseEntity.internalServerError().body("Something went wong while deposit");
+			transactionResponse.setError("Something went wong while deposit");
+			return ResponseEntity.internalServerError().body(transactionResponse);
 		}
 	}
 	
@@ -96,7 +101,24 @@ public class TransactionController {
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			logger.error("Some exception occured at the server: ", e);
-			return ResponseEntity.internalServerError().body("Something went wong while deposit");
+			transactionResponse.setError("Something went wong while deposit");
+			return ResponseEntity.internalServerError().body(transactionResponse);
+		}
+	}
+	
+	@PostMapping("/transactions")
+	public ResponseEntity<?> fetchAccountTransactions(@RequestBody TransactionsRequest transactionsRequest) {
+		TransactionsResponse transactionsResponse = new TransactionsResponse();
+		try {
+			transactionsResponse = transactionService.fetchTransactions(transactionsRequest);
+			return ResponseEntity.ok(transactionsResponse);
+		} catch (InvalidAccountException e) {
+			transactionsResponse.setErrorMessage("Account id doesn't belongs to the user");
+			return new ResponseEntity<TransactionsResponse>(transactionsResponse, HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch (Exception e) {
+			logger.error("Some exception occured at the server: ", e);
+			transactionsResponse.setErrorMessage("Something went wong while fetching transactions");
+			return ResponseEntity.internalServerError().body(transactionsResponse);
 		}
 	}
 }

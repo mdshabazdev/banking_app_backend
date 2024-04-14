@@ -1,6 +1,7 @@
 package com.example.banking.application.service;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,21 @@ public class AccountService {
 		accountRepository.save(accountEntity);
 		
 		return "Account created successfully";
+	}
+
+	public Set<AccountEntity> fetchAccounts() throws Exception {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userName = authentication.getName();
+		
+		CustomerEntity customerEntity = customerRepository.findByUsername(userName);
+		
+		Set<AccountEntity> accounts = customerEntity.getAccounts();
+		
+		if(accounts.size() == 0) {
+			throw new Exception("No accounts associated with the user");
+		}
+	
+		return accounts;
 	}
 
 }
